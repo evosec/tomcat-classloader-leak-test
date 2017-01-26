@@ -1,6 +1,6 @@
 Software License Agreement (MIT License)
 
-Copyright (c) 2015 Arlo Louis O'Keeffe, Evosec GmbH & Co. KG
+Copyright (c) 2017 Arlo Louis O'Keeffe, Evosec GmbH & Co. KG
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
