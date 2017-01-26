@@ -11,7 +11,7 @@ before_script:
   - tar xvf gnupg.tar
 script:
   - echo "<settings><servers><server><id>ossrh</id><username>\${env.SONATYPE_USERNAME}</username><password>\${env.SONATYPE_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
-  - mvn deploy -Dgpg.passphrase=$GPG_PASSPHRASE -Dgpg.homedir=.
+  - mvn deploy -Dgpg.passphrase=$GPG_PASSPHRASE -Dgpg.homedir=./gnupg
 
 env:
   global:
