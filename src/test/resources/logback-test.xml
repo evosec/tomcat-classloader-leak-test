@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration>
+
+    <appender
+        name="STDOUT"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <encoder>
+            <pattern><![CDATA[%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n]]></pattern>
+        </encoder>
+    </appender>
+
+    <appender
+        name="STDERR"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern><![CDATA[%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n]]></pattern>
+        </encoder>
+    </appender>
+
+    <logger
+        name="de.evosec"
+        level="INFO" />
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDERR" />
+    </root>
+
+</configuration>
