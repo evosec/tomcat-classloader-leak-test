@@ -1,0 +1,20 @@
+language: java
+jdk: oraclejdk8
+
+cache:
+  directories:
+  - $HOME/.m2/repository
+
+install: mvn install -DskipTests=true
+before_script:
+  - openssl aes-256-cbc -K $encrypted_809e589f51e5_key -iv $encrypted_809e589f51e5_iv -in gnupg.tar.enc -out gnupg.tar -d
+  - tar xvf gnupg.tar
+script:
+  - echo "<settings><servers><server><id>ossrh</id><username>\${env.SONATYPE_USERNAME}</username><password>\${env.SONATYPE_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
+  - mvn deploy -Dgpg.passphrase=$GPG_PASSPHRASE -Dgpg.homedir=./gnupg
+
+env:
+  global:
+    - secure: mvEdJcU7w8vbQLLY65QuX9vJ6hzeCvXZbFkborsy8L4pDG+pwJHOqrfSr0CaT8RUTuOwl75rAs/d1tI86qK433wOnne/vkar3Z1VhBZdUWB+8RocH20sHFGvFBJiY6LU5XCXQQDDBgX8wF9Unm1T6oVMhntd3S67fKR8jSIDEUwvXQqZO072NGQK/bk6YZKtxHO4LaYVDCyDuC+a9WtsfLMR0M8fSeutH4mL90gkZ68xP3FMvmyFZ1/kmaheUYQ5V77e0Hfb66qXjfafUzsJgsJ48TAqzCU63n6WH0+ZSjBu3t/DaaxsASq5BnOF7vGc90d9Jr2q4I0dcuuHhKlWBlpXhtolk1pk552eVHsKZqOUc5b84z4+go5l4YK45anVOxd1hAslrCrwGz55RO/51/aEQmC3/sGY/zQYv/IGwmTJuqTbsXu03XFnUPnXLxzsv5XQTGP5mgrEZJejNqw9mP0RRAHis3OgvorXri19EjanhFbwzSNJDOvS6cEfOhJM9UcfneW9WM5sDglmQQBjfrLN/LFVKyH3yLizMetMhtCmFhJtybReKeVF4F1YwkAvo9GQ3u7c0eqIcagn+kiQFiQqC519OGz37I/LtH1oEYPuisy1NcIkGToiNT+wY+1CoXgfOC6+6MCZFAKZyJteHAdNo0KKrT7SWMQwARNraMw=
+    - secure: z+cv91inFBdXNThgAFFVk5gXdM+A2ekiJ5iU/Lew/hAZnNzcMV0vffSaC7bHX8bqqoYAo56cmAmD0MKoUJiCxdPYO3bd6BDS2FswMWXvTVv2XQke/wm80edxBTGt4MmFjS/4RLXPxyjrSdKCSHKPkIMfF9HxWaLew1SSahah5px8lYDxuU6e+97mGBpBZwFuLC8x7UvqJpY5ToXZHfXaRu94T5lmIEzp+cS01vSvqS55xKCG/Ls/9KPWSw5u/T7m3NmuEVbHC1gEDU7RbEEQs48wvJJI8VCsUptm5maLe3BcaNU9w2zi5hGMV2DvtMPVidmRZWVwDofmiw1XD+0GATNQGRYkypJjIGmWO04TlvkXku4BxOkXy3aBIWOvcEVHKumNeeInKxEWBiTjbmBZjPuw/YsBx3N0fc8Il73/TSFrCvWbYT9l9pveOG+H64XNAuBXotciMHuZBxH2X9zs3Z7WFcZOVgeyFegZEYHws3LzPzU5sGkFl2dcT55UvWby38k81OiNfZeHnvM+Np+7MjDQfjH4OG2UWyO7/dSMAt4o6wLLg3gjjCiMqYjtYYxQiSpiQ2xwP2jixJIqWc7agF/UpLlIBCNWZARw54Ryefs+cxR0EO6sIHxiCnaeJe+Da3HIpjBweogLw+VOthFFLAIx11mnZEmv4UpGfRNO0Yw=
+    - secure: tKYW7WO8+fOnBzLFS9cAK8rvyEclQ52lJ9zuuraAH7OLajiIxkkfr/jvULx/l8lrmu5jr/tfhiD10gxDSHJL0zyvWzUjOFIjVUwpUGfIvBi9yzDP7Khdb6DvvFZphJUbq8orfCyERK8kMNFjgkzRqnsg4pfMfOs7VaReOJvczi27DoRDWna78ghJIsX2fY+ryiPy4T4cZAiJxeWXOBuWqWyfoBO45s09ybMHMn+zGcnnLIE+bVJOCdC/2xrRnGdTpGjcxOoM0xnduv9RHtNpmKqNtwGlZRllOKFT1ucRj2pyCe/+hHWMgKidAjSmfnE+yQU1/eKsolJ36SY+5uhkunQA5rCT/Iw9QsOlVLA0bn2Utr4H3aFPYoDRC6845NZ9NEk+jz2pQdM06Adn16pfrkAfQ6uxHA6ITlGvTKrHYcogmDQRMEfCWlnTf4tYj59CxB6ryhVq1P5fLcVJbU7ADkcRPxOnRqGP0JI7k9T90+sHAabd4BfrSQSu9bF6EsP0LLHF6VbFbfFvtrMCgg+Yl9App6PLbDmo5xkeLtTlKrpy3jvQst2KHC9zsDl4q10rN5Pgb+jywHI1eNbP2ZQjp27iaWI5wfCOwEUKOdHgcfmb3t8kMKQEWpEE6h9PyzSaJUzztLb/i+p2Xy4GG8lxDRt4zgURFQxJmjApHyAC734=
