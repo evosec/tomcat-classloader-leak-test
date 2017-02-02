@@ -50,7 +50,7 @@ An integration test for your webapp that checks if it cleans up after itself.
 </plugin>
 ~~~
 
-`src/main/it/com/example/ClassLoaderLeakTestIT`:
+`src/it/java/com/example/ClassLoaderLeakTestIT`:
 ~~~
 package com.example;
 
