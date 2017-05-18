@@ -8,6 +8,13 @@ An integration test for your webapp that checks if it cleans up after itself.
 
 `pom.xml`:
 ~~~
+<dependency>
+    <groupId>de.evosec</groupId>
+    <artifactId>tomcat-classloader-leak-test</artifactId>
+    <version>0.0.1</version>
+    <scope>test</scope>
+</dependency>
+
 <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>build-helper-maven-plugin</artifactId>
@@ -40,6 +47,7 @@ An integration test for your webapp that checks if it cleans up after itself.
                 <classpathDependencyExcludes>
                     <classpathDependencyExclude>org.springframework.boot:spring-boot-devtools</classpathDependencyExclude>
                 </classpathDependencyExcludes>
+                <argLine><![CDATA[-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${project.build.directory} -XX:MaxMetaspaceSize=160m]]></argLine>
                 <testSourceDirectory>${project.basedir}/src/it/java</testSourceDirectory>
                 <systemPropertyVariables>
                     <warName>${project.build.finalName}</warName>
