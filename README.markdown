@@ -78,3 +78,13 @@ public class ClassLoaderLeakTestIT {
 
 }
 ~~~
+
+## How it works
+
+1. The test setups an embedded Tomcat.
+2. Then the war file from the build is added to the Tomcat
+3. Wait for the application to start (By default it waits until the root returns HTTP 200 OK)
+4. Get a WeakReference to the started Context
+5. Stop the application
+6. Start creating classes to put the Metaspace/PermGen under pressure - thus triggering GC eventually.
+7. Stop when WeakReference is null - thus the Context has been cleaned up properly. If not, then there is a ClassLoader leak.
