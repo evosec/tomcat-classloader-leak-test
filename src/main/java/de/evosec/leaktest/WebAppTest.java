@@ -21,10 +21,10 @@ import java.util.concurrent.Callable;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.ThreadLocalLeakPreventionListener;
-import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 
 import com.jayway.awaitility.Duration;
@@ -118,7 +118,7 @@ public class WebAppTest {
 
 			port = tomcat.getConnector().getLocalPort();
 
-			ContextConfig config =
+			LifecycleListener config =
 			        new CustomContextConfig(contextPath, port, "/test");
 
 			context = tomcat.addWebapp(tomcat.getHost(), "/test",
