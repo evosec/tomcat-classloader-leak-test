@@ -1,6 +1,5 @@
 package de.evosec.leaktest;
 
-import static com.jayway.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
@@ -26,9 +25,9 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.ThreadLocalLeakPreventionListener;
 import org.apache.catalina.startup.Tomcat;
-
-import com.jayway.awaitility.Duration;
-import com.jayway.awaitility.core.ConditionTimeoutException;
+import org.awaitility.Awaitility;
+import org.awaitility.Duration;
+import org.awaitility.core.ConditionTimeoutException;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -203,7 +202,8 @@ public class WebAppTest {
 			if (tomcat != null && !contextIsDestroyed.call()) {
 				tomcat.stop();
 				tomcat.destroy();
-				await().atMost(Duration.ONE_MINUTE).until(contextIsDestroyed);
+				Awaitility.await().atMost(Duration.ONE_MINUTE)
+				    .until(contextIsDestroyed);
 			}
 		} catch (Exception e) {
 			throw new WebAppTestException(e);
@@ -218,7 +218,7 @@ public class WebAppTest {
 
 	private void ping(final URL url) throws WebAppTestException {
 		try {
-			await().atMost(new Duration(deployDuration, SECONDS))
+			Awaitility.await().atMost(new Duration(deployDuration, SECONDS))
 			    .pollInterval(Duration.ONE_SECOND)
 			    .until(new Callable<Boolean>() {
 
@@ -258,7 +258,7 @@ public class WebAppTest {
 		createClassesUntil(classLoaderReferenceIsNull);
 
 		try {
-			await().atMost(Duration.TWO_MINUTES)
+			Awaitility.await().atMost(Duration.TWO_MINUTES)
 			    .until(classLoaderReferenceIsNull);
 		} catch (ConditionTimeoutException e) {
 			throw new WebAppTestException("ClassLoader not GC'ed", e);
