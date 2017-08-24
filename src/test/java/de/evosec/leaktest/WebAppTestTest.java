@@ -1,5 +1,6 @@
 package de.evosec.leaktest;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -28,7 +29,7 @@ public class WebAppTestTest {
 	@Test
 	public void testSuccessfulWithContextXml() throws Exception {
 		Path warPath = getClassPathResource("webapp-test-working.war");
-		Path contextPath = getClassPathResource("tomcat-context-working.xml");
+		URL contextPath = getClassPathUrl("tomcat-context-working.xml");
 		new WebAppTest().warPath(warPath).contextPath(contextPath).run();
 	}
 
@@ -41,7 +42,7 @@ public class WebAppTestTest {
 	@Test(expected = WebAppTestException.class)
 	public void testFailingWithContextXml() throws Exception {
 		Path warPath = getClassPathResource("webapp-test-working.war");
-		Path contextPath = getClassPathResource("tomcat-context-bad.xml");
+		URL contextPath = getClassPathUrl("tomcat-context-bad.xml");
 		new WebAppTest().warPath(warPath).contextPath(contextPath).run();
 	}
 
@@ -58,9 +59,13 @@ public class WebAppTestTest {
 	}
 
 	public Path getClassPathResource(String path) throws Exception {
+		return Paths.get(getClassPathUrl(path).toURI());
+	}
+
+	public URL getClassPathUrl(String path) throws Exception {
 		ClassLoader contextClassLoader =
 		        Thread.currentThread().getContextClassLoader();
-		return Paths.get(contextClassLoader.getResource(path).toURI());
+		return contextClassLoader.getResource(path);
 	}
 
 }

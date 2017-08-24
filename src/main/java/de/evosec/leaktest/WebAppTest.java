@@ -1,6 +1,5 @@
 package de.evosec.leaktest;
 
-import static com.jayway.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
@@ -19,19 +18,16 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import javax.servlet.ServletException;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.ThreadLocalLeakPreventionListener;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.webresources.StandardRoot;
-
-import com.jayway.awaitility.Duration;
-import com.jayway.awaitility.core.ConditionTimeoutException;
+import org.awaitility.Awaitility;
+import org.awaitility.Duration;
+import org.awaitility.core.ConditionTimeoutException;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -53,7 +49,7 @@ public class WebAppTest {
 	private Path warPath;
 	private String pingEndPoint = "";
 	private long deployDuration = 10;
-	private Path contextPath;
+	private URL contextPath;
 	private boolean testLeak = true;
 
 	private Tomcat tomcat;
@@ -77,7 +73,23 @@ public class WebAppTest {
 		return this;
 	}
 
+	/**
+	 * @param contextPath
+	 *            The path to the context xml
+	 * @return this WebAppTest
+	 * @deprecated Use contextPath(URL) instead
+	 */
+	@Deprecated
 	public WebAppTest contextPath(Path contextPath) {
+		try {
+			this.contextPath = contextPath.toUri().toURL();
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException(e);
+		}
+		return this;
+	}
+
+	public WebAppTest contextPath(URL contextPath) {
 		this.contextPath = contextPath;
 		return this;
 	}
@@ -99,25 +111,26 @@ public class WebAppTest {
 		try {
 			tomcat = getTomcatInstance();
 
-			context = tomcat.addWebapp("/test",
-			    warPath.toAbsolutePath().toString());
-
-			configureContext();
-
 			configureTomcat();
 
 			tomcat.start();
+
+			port = tomcat.getConnector().getLocalPort();
+
+			LifecycleListener config =
+			        new CustomContextConfig(contextPath, port, "/test");
+
+			context = tomcat.addWebapp(tomcat.getHost(), "/test",
+			    warPath.toAbsolutePath().toString(), config);
 
 			checkContextStarted();
 
 			classLoaderReference =
 			        new WeakReference<>(context.getLoader().getClassLoader());
 
-			port = tomcat.getConnector().getLocalPort();
-
 			ping(new URL("http", "localhost", port, "/test/" + pingEndPoint));
 
-		} catch (IOException | ServletException | LifecycleException e) {
+		} catch (IOException | IllegalStateException | LifecycleException e) {
 			shutdownTomcat();
 			throw new WebAppTestException(e);
 		}
@@ -189,7 +202,8 @@ public class WebAppTest {
 			if (tomcat != null && !contextIsDestroyed.call()) {
 				tomcat.stop();
 				tomcat.destroy();
-				await().atMost(Duration.ONE_MINUTE).until(contextIsDestroyed);
+				Awaitility.await().atMost(Duration.ONE_MINUTE)
+				    .until(contextIsDestroyed);
 			}
 		} catch (Exception e) {
 			throw new WebAppTestException(e);
@@ -202,27 +216,9 @@ public class WebAppTest {
 		}
 	}
 
-	private void configureContext() throws MalformedURLException {
-		StandardRoot resources = new StandardRoot(context);
-		resources.setCachingAllowed(false);
-
-		context.setResources(resources);
-
-		if (contextPath != null) {
-			context.setConfigFile(contextPath.toUri().toURL());
-		}
-
-		if (context instanceof StandardContext) {
-			StandardContext standardContext = (StandardContext) context;
-			standardContext.setClearReferencesHttpClientKeepAliveThread(true);
-			standardContext.setClearReferencesStopThreads(true);
-			standardContext.setClearReferencesStopTimerThreads(true);
-		}
-	}
-
 	private void ping(final URL url) throws WebAppTestException {
 		try {
-			await().atMost(new Duration(deployDuration, SECONDS))
+			Awaitility.await().atMost(new Duration(deployDuration, SECONDS))
 			    .pollInterval(Duration.ONE_SECOND)
 			    .until(new Callable<Boolean>() {
 
@@ -262,7 +258,7 @@ public class WebAppTest {
 		createClassesUntil(classLoaderReferenceIsNull);
 
 		try {
-			await().atMost(Duration.TWO_MINUTES)
+			Awaitility.await().atMost(Duration.TWO_MINUTES)
 			    .until(classLoaderReferenceIsNull);
 		} catch (ConditionTimeoutException e) {
 			throw new WebAppTestException("ClassLoader not GC'ed", e);
