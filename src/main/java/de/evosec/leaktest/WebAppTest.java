@@ -19,16 +19,13 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import javax.servlet.ServletException;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.ThreadLocalLeakPreventionListener;
+import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.webresources.StandardRoot;
 
 import com.jayway.awaitility.Duration;
 import com.jayway.awaitility.core.ConditionTimeoutException;
@@ -115,25 +112,26 @@ public class WebAppTest {
 		try {
 			tomcat = getTomcatInstance();
 
-			context = tomcat.addWebapp("/test",
-			    warPath.toAbsolutePath().toString());
-
-			configureContext();
-
 			configureTomcat();
 
 			tomcat.start();
+
+			port = tomcat.getConnector().getLocalPort();
+
+			ContextConfig config =
+			        new CustomContextConfig(contextPath, port, "/test");
+
+			context = tomcat.addWebapp(tomcat.getHost(), "/test",
+			    warPath.toAbsolutePath().toString(), config);
 
 			checkContextStarted();
 
 			classLoaderReference =
 			        new WeakReference<>(context.getLoader().getClassLoader());
 
-			port = tomcat.getConnector().getLocalPort();
-
 			ping(new URL("http", "localhost", port, "/test/" + pingEndPoint));
 
-		} catch (IOException | ServletException | LifecycleException e) {
+		} catch (IOException | IllegalStateException | LifecycleException e) {
 			shutdownTomcat();
 			throw new WebAppTestException(e);
 		}
@@ -215,24 +213,6 @@ public class WebAppTest {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-	}
-
-	private void configureContext() throws MalformedURLException {
-		StandardRoot resources = new StandardRoot(context);
-		resources.setCachingAllowed(false);
-
-		context.setResources(resources);
-
-		if (contextPath != null) {
-			context.setConfigFile(contextPath);
-		}
-
-		if (context instanceof StandardContext) {
-			StandardContext standardContext = (StandardContext) context;
-			standardContext.setClearReferencesHttpClientKeepAliveThread(true);
-			standardContext.setClearReferencesStopThreads(true);
-			standardContext.setClearReferencesStopTimerThreads(true);
 		}
 	}
 
