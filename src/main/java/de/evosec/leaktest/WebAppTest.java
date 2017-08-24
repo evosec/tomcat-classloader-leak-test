@@ -53,7 +53,7 @@ public class WebAppTest {
 	private Path warPath;
 	private String pingEndPoint = "";
 	private long deployDuration = 10;
-	private Path contextPath;
+	private URL contextPath;
 	private boolean testLeak = true;
 
 	private Tomcat tomcat;
@@ -78,6 +78,15 @@ public class WebAppTest {
 	}
 
 	public WebAppTest contextPath(Path contextPath) {
+		try {
+			this.contextPath = contextPath.toUri().toURL();
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException(e);
+		}
+		return this;
+	}
+
+	public WebAppTest contextPath(URL contextPath) {
 		this.contextPath = contextPath;
 		return this;
 	}
@@ -209,7 +218,7 @@ public class WebAppTest {
 		context.setResources(resources);
 
 		if (contextPath != null) {
-			context.setConfigFile(contextPath.toUri().toURL());
+			context.setConfigFile(contextPath);
 		}
 
 		if (context instanceof StandardContext) {
