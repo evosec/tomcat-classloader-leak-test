@@ -58,6 +58,12 @@ public class WebAppTestTest {
 		new WebAppTest().warPath(warPath).run();
 	}
 
+	@Test
+	public void testSpringBoot() throws Exception {
+		Path warPath = getClassPathResource("spring-boot.war");
+		new WebAppTest().warPath(warPath).run();
+	}
+
 	public Path getClassPathResource(String path) throws Exception {
 		return Paths.get(getClassPathUrl(path).toURI());
 	}
