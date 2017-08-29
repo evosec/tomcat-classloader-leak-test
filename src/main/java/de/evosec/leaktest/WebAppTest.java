@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -51,6 +53,7 @@ public class WebAppTest {
 	private long deployDuration = 10;
 	private URL contextPath;
 	private boolean testLeak = true;
+	private final Map<String, String> contextParameters = new HashMap<>();
 
 	private Tomcat tomcat;
 	private DestroyListener destroyListener;
@@ -96,6 +99,11 @@ public class WebAppTest {
 
 	public WebAppTest testLeak(boolean testLeak) {
 		this.testLeak = testLeak;
+		return this;
+	}
+
+	public WebAppTest contextParameter(String key, String value) {
+		contextParameters.put(key, value);
 		return this;
 	}
 
