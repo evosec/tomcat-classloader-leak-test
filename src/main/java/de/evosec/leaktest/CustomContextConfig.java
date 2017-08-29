@@ -37,6 +37,7 @@ public class CustomContextConfig extends ContextConfig {
 			standardContext.setClearReferencesHttpClientKeepAliveThread(true);
 			standardContext.setClearReferencesStopThreads(true);
 			standardContext.setClearReferencesStopTimerThreads(true);
+			standardContext.setAntiResourceLocking(true);
 		}
 
 		super.init();
