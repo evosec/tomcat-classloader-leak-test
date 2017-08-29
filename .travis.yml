@@ -5,7 +5,6 @@ cache:
   directories:
   - $HOME/.m2/repository
 
-install: mvn install -DskipTests=true
 before_script:
   - openssl aes-256-cbc -K $encrypted_809e589f51e5_key -iv $encrypted_809e589f51e5_iv -in gnupg.tar.enc -out gnupg.tar -d
   - tar xvf gnupg.tar
