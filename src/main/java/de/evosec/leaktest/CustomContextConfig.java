@@ -1,6 +1,7 @@
 package de.evosec.leaktest;
 
 import java.net.URL;
+import java.util.Map;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.ContextConfig;
@@ -11,18 +12,21 @@ public class CustomContextConfig extends ContextConfig {
 	private final URL contextConfig;
 	private final int port;
 	private final String contextPath;
+	private final Map<String, String> contextParameters;
 
-	public CustomContextConfig(URL contextConfig, int port,
-	        String contextPath) {
+	public CustomContextConfig(URL contextConfig, int port, String contextPath,
+	        Map<String, String> contextParameters) {
 		this.contextConfig = contextConfig;
 		this.port = port;
 		this.contextPath = contextPath;
+		this.contextParameters = contextParameters;
 	}
 
 	@Override
 	protected void init() {
 		context.addParameter("server.port", "" + port);
 		context.addParameter("server.context-path", contextPath);
+		contextParameters.forEach((k, v) -> context.addParameter(k, v));
 
 		if (contextConfig != null) {
 			context.setConfigFile(contextConfig);
@@ -37,6 +41,7 @@ public class CustomContextConfig extends ContextConfig {
 			standardContext.setClearReferencesHttpClientKeepAliveThread(true);
 			standardContext.setClearReferencesStopThreads(true);
 			standardContext.setClearReferencesStopTimerThreads(true);
+			standardContext.setAntiResourceLocking(true);
 		}
 
 		super.init();

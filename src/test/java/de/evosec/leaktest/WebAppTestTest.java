@@ -58,6 +58,35 @@ public class WebAppTestTest {
 		new WebAppTest().warPath(warPath).run();
 	}
 
+	@Test
+	public void testSpringBoot() throws Exception {
+		Path warPath = getClassPathResource("spring-boot.war");
+		new WebAppTest().warPath(warPath).run();
+	}
+
+	@Test
+	public void testSpringBootClassLoaderLeakPreventor3_2_4_0()
+	        throws Exception {
+		Path warPath = getClassPathResource(
+		    "spring-boot-classloader-leak-preventor3-2.4.0.war");
+		new WebAppTest().warPath(warPath).run();
+	}
+
+	@Test
+	public void testSpringBootClassLoaderLeakPreventor_2_4_0()
+	        throws Exception {
+		Path warPath = getClassPathResource(
+		    "spring-boot-classloader-leak-preventor-2.4.0.war");
+		new WebAppTest().warPath(warPath).run();
+	}
+
+	@Test
+	public void testWebappClassLoaderLeakPreventor3_2_4_0() throws Exception {
+		Path warPath = getClassPathResource(
+		    "webapp-classloader-leak-preventor3-2.4.0.war");
+		new WebAppTest().warPath(warPath).run();
+	}
+
 	public Path getClassPathResource(String path) throws Exception {
 		return Paths.get(getClassPathUrl(path).toURI());
 	}
