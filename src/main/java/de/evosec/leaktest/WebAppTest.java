@@ -135,7 +135,8 @@ public class WebAppTest {
 			classLoaderReference =
 			        new WeakReference<>(context.getLoader().getClassLoader());
 
-			ping(new URL("http", "localhost", port, contextPath + "/" + pingEndPoint));
+			ping(new URL("http", "localhost", port,
+			    contextPath + "/" + pingEndPoint));
 
 		} catch (IOException | IllegalStateException | LifecycleException e) {
 			shutdownTomcat();
