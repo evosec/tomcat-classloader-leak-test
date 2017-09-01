@@ -1,6 +1,10 @@
 language: java
 jdk: oraclejdk8
 
+branches:
+  except:
+    - master
+
 cache:
   directories:
   - $HOME/.m2/repository
