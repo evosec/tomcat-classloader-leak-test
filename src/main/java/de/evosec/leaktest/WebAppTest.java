@@ -122,10 +122,10 @@ public class WebAppTest {
 
 			port = tomcat.getConnector().getLocalPort();
 
-			LifecycleListener config = new CustomContextConfig(contextConfig,
-			    port, "/test", contextParameters);
-
 			String contextPath = "/" + UUID.randomUUID().toString();
+
+			LifecycleListener config = new CustomContextConfig(contextConfig,
+			    port, contextPath, contextParameters);
 
 			context = tomcat.addWebapp(tomcat.getHost(), contextPath,
 			    warPath.toAbsolutePath().toString(), config);
