@@ -125,7 +125,9 @@ public class WebAppTest {
 			LifecycleListener config = new CustomContextConfig(contextConfig,
 			    port, "/test", contextParameters);
 
-			context = tomcat.addWebapp(tomcat.getHost(), "/test",
+			String contextPath = "/" + UUID.randomUUID().toString();
+
+			context = tomcat.addWebapp(tomcat.getHost(), contextPath,
 			    warPath.toAbsolutePath().toString(), config);
 
 			checkContextStarted();
@@ -133,7 +135,7 @@ public class WebAppTest {
 			classLoaderReference =
 			        new WeakReference<>(context.getLoader().getClassLoader());
 
-			ping(new URL("http", "localhost", port, "/test/" + pingEndPoint));
+			ping(new URL("http", "localhost", port, contextPath + "/" + pingEndPoint));
 
 		} catch (IOException | IllegalStateException | LifecycleException e) {
 			shutdownTomcat();
