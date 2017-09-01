@@ -8,6 +8,7 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.FileVisitResult;
@@ -51,7 +52,7 @@ public class WebAppTest {
 	private Path warPath;
 	private String pingEndPoint = "";
 	private long deployDuration = 10;
-	private URL contextPath;
+	private URL contextConfig;
 	private boolean testLeak = true;
 	private final Map<String, String> contextParameters = new HashMap<>();
 
@@ -76,24 +77,20 @@ public class WebAppTest {
 		return this;
 	}
 
-	/**
-	 * @param contextPath
-	 *            The path to the context xml
-	 * @return this WebAppTest
-	 * @deprecated Use contextPath(URL) instead
-	 */
-	@Deprecated
-	public WebAppTest contextPath(Path contextPath) {
+	public WebAppTest contextConfig(Path contextConfig) {
+		return this.contextConfig(contextConfig.toUri());
+	}
+
+	public WebAppTest contextConfig(URI contextConfig) {
 		try {
-			this.contextPath = contextPath.toUri().toURL();
+			return this.contextConfig(contextConfig.toURL());
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException(e);
 		}
-		return this;
 	}
 
-	public WebAppTest contextPath(URL contextPath) {
-		this.contextPath = contextPath;
+	public WebAppTest contextConfig(URL contextConfig) {
+		this.contextConfig = contextConfig;
 		return this;
 	}
 
@@ -125,10 +122,12 @@ public class WebAppTest {
 
 			port = tomcat.getConnector().getLocalPort();
 
-			LifecycleListener config = new CustomContextConfig(contextPath,
-			    port, "/test", contextParameters);
+			String contextPath = "/" + UUID.randomUUID().toString();
 
-			context = tomcat.addWebapp(tomcat.getHost(), "/test",
+			LifecycleListener config = new CustomContextConfig(contextConfig,
+			    port, contextPath, contextParameters);
+
+			context = tomcat.addWebapp(tomcat.getHost(), contextPath,
 			    warPath.toAbsolutePath().toString(), config);
 
 			checkContextStarted();
@@ -136,7 +135,8 @@ public class WebAppTest {
 			classLoaderReference =
 			        new WeakReference<>(context.getLoader().getClassLoader());
 
-			ping(new URL("http", "localhost", port, "/test/" + pingEndPoint));
+			ping(new URL("http", "localhost", port,
+			    contextPath + "/" + pingEndPoint));
 
 		} catch (IOException | IllegalStateException | LifecycleException e) {
 			shutdownTomcat();
