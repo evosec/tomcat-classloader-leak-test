@@ -8,6 +8,7 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.FileVisitResult;
@@ -77,8 +78,12 @@ public class WebAppTest {
 	}
 
 	public WebAppTest contextConfig(Path contextConfig) {
+		return this.contextConfig(contextConfig.toUri());
+	}
+
+	public WebAppTest contextConfig(URI contextConfig) {
 		try {
-			return this.contextConfig(contextConfig.toUri().toURL());
+			return this.contextConfig(contextConfig.toURL());
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException(e);
 		}
