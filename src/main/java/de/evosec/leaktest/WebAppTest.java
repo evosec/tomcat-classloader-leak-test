@@ -76,13 +76,6 @@ public class WebAppTest {
 		return this;
 	}
 
-	/**
-	 * @param contextPath
-	 *            The path to the context xml
-	 * @return this WebAppTest
-	 * @deprecated Use contextConfig(URL) instead
-	 */
-	@Deprecated
 	public WebAppTest contextConfig(Path contextConfig) {
 		try {
 			return this.contextConfig(contextConfig.toUri().toURL());
