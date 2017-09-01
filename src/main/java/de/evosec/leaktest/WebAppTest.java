@@ -51,7 +51,7 @@ public class WebAppTest {
 	private Path warPath;
 	private String pingEndPoint = "";
 	private long deployDuration = 10;
-	private URL contextPath;
+	private URL contextConfig;
 	private boolean testLeak = true;
 	private final Map<String, String> contextParameters = new HashMap<>();
 
@@ -80,20 +80,19 @@ public class WebAppTest {
 	 * @param contextPath
 	 *            The path to the context xml
 	 * @return this WebAppTest
-	 * @deprecated Use contextPath(URL) instead
+	 * @deprecated Use contextConfig(URL) instead
 	 */
 	@Deprecated
-	public WebAppTest contextPath(Path contextPath) {
+	public WebAppTest contextConfig(Path contextConfig) {
 		try {
-			this.contextPath = contextPath.toUri().toURL();
+			return this.contextConfig(contextConfig.toUri().toURL());
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException(e);
 		}
-		return this;
 	}
 
-	public WebAppTest contextPath(URL contextPath) {
-		this.contextPath = contextPath;
+	public WebAppTest contextConfig(URL contextConfig) {
+		this.contextConfig = contextConfig;
 		return this;
 	}
 
@@ -125,7 +124,7 @@ public class WebAppTest {
 
 			port = tomcat.getConnector().getLocalPort();
 
-			LifecycleListener config = new CustomContextConfig(contextPath,
+			LifecycleListener config = new CustomContextConfig(contextConfig,
 			    port, "/test", contextParameters);
 
 			context = tomcat.addWebapp(tomcat.getHost(), "/test",

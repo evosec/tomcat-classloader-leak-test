@@ -30,7 +30,7 @@ public class WebAppTestTest {
 	public void testSuccessfulWithContextXml() throws Exception {
 		Path warPath = getClassPathResource("webapp-test-working.war");
 		URL contextPath = getClassPathUrl("tomcat-context-working.xml");
-		new WebAppTest().warPath(warPath).contextPath(contextPath).run();
+		new WebAppTest().warPath(warPath).contextConfig(contextPath).run();
 	}
 
 	@Test(expected = WebAppTestException.class)
@@ -43,7 +43,7 @@ public class WebAppTestTest {
 	public void testFailingWithContextXml() throws Exception {
 		Path warPath = getClassPathResource("webapp-test-working.war");
 		URL contextPath = getClassPathUrl("tomcat-context-bad.xml");
-		new WebAppTest().warPath(warPath).contextPath(contextPath).run();
+		new WebAppTest().warPath(warPath).contextConfig(contextPath).run();
 	}
 
 	@Test(expected = WebAppTestException.class)
