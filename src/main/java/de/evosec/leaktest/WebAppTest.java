@@ -127,7 +127,7 @@ public class WebAppTest {
 
 			port = tomcat.getConnector().getLocalPort();
 
-			String contextPath = "/" + UUID.randomUUID().toString();
+			contextPath = "/" + UUID.randomUUID().toString();
 
 			LifecycleListener config = new CustomContextConfig(contextConfig,
 			    port, contextPath, contextParameters);
