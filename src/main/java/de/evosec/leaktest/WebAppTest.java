@@ -61,6 +61,7 @@ public class WebAppTest {
 	private Context context;
 	private WeakReference<ClassLoader> classLoaderReference;
 	private int port;
+	private String contextPath;
 
 	public WebAppTest warPath(Path warPath) {
 		this.warPath = warPath;
@@ -108,6 +109,10 @@ public class WebAppTest {
 		return port;
 	}
 
+	public String getContextPath() {
+		return contextPath;
+	}
+
 	public void start() throws WebAppTestException {
 		checkArguments();
 
@@ -122,7 +127,7 @@ public class WebAppTest {
 
 			port = tomcat.getConnector().getLocalPort();
 
-			String contextPath = "/" + UUID.randomUUID().toString();
+			contextPath = "/" + UUID.randomUUID().toString();
 
 			LifecycleListener config = new CustomContextConfig(contextConfig,
 			    port, contextPath, contextParameters);
