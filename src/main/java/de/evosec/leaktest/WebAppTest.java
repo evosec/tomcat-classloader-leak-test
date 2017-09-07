@@ -61,6 +61,7 @@ public class WebAppTest {
 	private Context context;
 	private WeakReference<ClassLoader> classLoaderReference;
 	private int port;
+	private String contextPath;
 
 	public WebAppTest warPath(Path warPath) {
 		this.warPath = warPath;
@@ -106,6 +107,10 @@ public class WebAppTest {
 
 	public int getPort() {
 		return port;
+	}
+
+	public String getContextPath() {
+		return contextPath;
 	}
 
 	public void start() throws WebAppTestException {
