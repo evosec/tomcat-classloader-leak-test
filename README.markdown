@@ -70,10 +70,9 @@ public class ClassLoaderLeakTestIT {
 
     @Test
     public void test() throws Exception {
-        System.setProperty("spring.profiles.active", "integration");
         String warName = System.getProperty("warName", "demo-0.0.1-SNAPSHOT");
         Path warPath = Paths.get("./target/" + warName + ".war");
-        new WebAppTest().warPath(warPath).run();
+        new WebAppTest().warPath(warPath).contextParameter("spring.profiles.active", "integration").run();
     }
 
 }
