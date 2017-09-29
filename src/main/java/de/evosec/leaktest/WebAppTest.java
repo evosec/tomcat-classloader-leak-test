@@ -29,7 +29,6 @@ import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.ThreadLocalLeakPreventionListener;
 import org.apache.catalina.startup.Tomcat;
 import org.awaitility.Awaitility;
-import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
 
 import javassist.ClassPool;
@@ -51,7 +50,10 @@ public class WebAppTest {
 	private Path catalinaBase;
 	private Path warPath;
 	private String pingEndPoint = "";
-	private long deployDuration = 10;
+	private long deployTimeoutInSeconds = 10;
+	private long stopTimeoutInSeconds = 60;
+	private long leakTestFirstTimeoutInSeconds = 30;
+	private long leakTestSecondTimeoutInSeconds = 120;
 	private URL contextConfig;
 	private boolean testLeak = true;
 	private final Map<String, String> contextParameters = new HashMap<>();
@@ -73,8 +75,37 @@ public class WebAppTest {
 		return this;
 	}
 
-	public WebAppTest deployDuration(long deployDuration) {
-		this.deployDuration = deployDuration;
+	public WebAppTest deployTimeoutInSeconds(long deployTimeoutInSeconds) {
+		this.deployTimeoutInSeconds = deployTimeoutInSeconds;
+		return this;
+	}
+
+	public WebAppTest stopTimeoutInSeconds(long stopTimeoutInSeconds) {
+		this.stopTimeoutInSeconds = stopTimeoutInSeconds;
+		return this;
+	}
+
+	/**
+	 * @param leakTestFirstTimeoutInSeconds
+	 *            the period to wait for cleanup before starting to create new
+	 *            classes for GC pressure
+	 * @return the current WebAppTest
+	 */
+	public WebAppTest leakTestFirstTimeoutInSeconds(
+	        long leakTestFirstTimeoutInSeconds) {
+		this.leakTestFirstTimeoutInSeconds = leakTestFirstTimeoutInSeconds;
+		return this;
+	}
+
+	/**
+	 * @param leakTestSecondTimeoutInSeconds
+	 *            the period to wait for cleanup while creating new classes to
+	 *            put the GC under pressure
+	 * @return the current WebAppTest
+	 */
+	public WebAppTest leakTestSecondTimeoutInSeconds(
+	        long leakTestSecondTimeoutInSeconds) {
+		this.leakTestSecondTimeoutInSeconds = leakTestSecondTimeoutInSeconds;
 		return this;
 	}
 
@@ -215,7 +246,7 @@ public class WebAppTest {
 			if (tomcat != null && !contextIsDestroyed.call()) {
 				tomcat.stop();
 				tomcat.destroy();
-				Awaitility.await().atMost(Duration.ONE_MINUTE)
+				Awaitility.await().atMost(stopTimeoutInSeconds, SECONDS)
 				    .until(contextIsDestroyed);
 			}
 		} catch (Exception e) {
@@ -231,8 +262,7 @@ public class WebAppTest {
 
 	private void ping(final URL url) throws WebAppTestException {
 		try {
-			Awaitility.await().atMost(new Duration(deployDuration, SECONDS))
-			    .pollInterval(Duration.ONE_SECOND)
+			Awaitility.await().atMost(deployTimeoutInSeconds, SECONDS)
 			    .until(new Callable<Boolean>() {
 
 				    @Override
@@ -268,10 +298,19 @@ public class WebAppTest {
 
 		System.gc();
 
+		try {
+			Awaitility.await().atMost(leakTestFirstTimeoutInSeconds, SECONDS)
+			    .until(classLoaderReferenceIsNull);
+		} catch (ConditionTimeoutException e) {
+			// ignore
+		}
+
+		System.gc();
+
 		createClassesUntil(classLoaderReferenceIsNull);
 
 		try {
-			Awaitility.await().atMost(Duration.TWO_MINUTES)
+			Awaitility.await().atMost(leakTestSecondTimeoutInSeconds, SECONDS)
 			    .until(classLoaderReferenceIsNull);
 		} catch (ConditionTimeoutException e) {
 			throw new WebAppTestException("ClassLoader not GC'ed", e);
