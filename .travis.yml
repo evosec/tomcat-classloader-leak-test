@@ -5,6 +5,8 @@ branches:
   except:
     - master
 
+before_cache:
+  - rm -rf $HOME/.m2/repository/de/evosec/tomcat-classloader-leak-test
 cache:
   directories:
   - $HOME/.m2/repository
