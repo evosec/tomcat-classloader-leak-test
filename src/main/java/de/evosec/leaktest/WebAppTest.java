@@ -57,6 +57,7 @@ public class WebAppTest {
 	private URL contextConfig;
 	private boolean testLeak = true;
 	private final Map<String, String> contextParameters = new HashMap<>();
+	private CustomContextConfig customContextConfig;
 
 	private Tomcat tomcat;
 	private DestroyListener destroyListener;
@@ -160,11 +161,12 @@ public class WebAppTest {
 
 			contextPath = "/" + UUID.randomUUID().toString();
 
-			LifecycleListener config = new CustomContextConfig(contextConfig,
-			    port, contextPath, contextParameters);
+			customContextConfig = new CustomContextConfig(contextConfig, port,
+			    contextPath, contextParameters);
 
 			context = tomcat.addWebapp(tomcat.getHost(), contextPath,
-			    warPath.toAbsolutePath().toString(), config);
+			    warPath.toAbsolutePath().toString(),
+			    (LifecycleListener) customContextConfig);
 
 			checkContextStarted();
 
@@ -252,6 +254,10 @@ public class WebAppTest {
 		} catch (Exception e) {
 			throw new WebAppTestException(e);
 		} finally {
+			if (customContextConfig != null) {
+				customContextConfig.configureStop();
+				customContextConfig.destroy();
+			}
 			try {
 				delete(catalinaBase);
 			} catch (IOException e) {
