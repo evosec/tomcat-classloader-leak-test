@@ -52,4 +52,9 @@ public class CustomContextConfig extends ContextConfig {
 		super.configureStop();
 	}
 
+	@Override
+	public synchronized void destroy() {
+		super.destroy();
+	}
+
 }

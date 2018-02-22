@@ -256,6 +256,7 @@ public class WebAppTest {
 		} finally {
 			if (customContextConfig != null) {
 				customContextConfig.configureStop();
+				customContextConfig.destroy();
 			}
 			try {
 				delete(catalinaBase);
