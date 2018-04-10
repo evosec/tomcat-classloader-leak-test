@@ -26,6 +26,7 @@ public class CustomContextConfig extends ContextConfig {
 	protected void init() {
 		context.addParameter("server.port", "" + port);
 		context.addParameter("server.context-path", contextPath);
+		context.addParameter("server.servlet.context-path", contextPath);
 		contextParameters.forEach((k, v) -> context.addParameter(k, v));
 
 		if (contextConfig != null) {
