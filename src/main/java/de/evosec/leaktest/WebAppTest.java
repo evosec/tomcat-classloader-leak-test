@@ -50,6 +50,7 @@ public class WebAppTest {
 	private Path catalinaBase;
 	private Path warPath;
 	private String pingEndPoint = "";
+	private int pingStatusCode = 200;
 	private long deployTimeoutInSeconds = 10;
 	private long stopTimeoutInSeconds = 60;
 	private long leakTestFirstTimeoutInSeconds = 30;
@@ -73,6 +74,11 @@ public class WebAppTest {
 
 	public WebAppTest pingEndPoint(String pingEndPoint) {
 		this.pingEndPoint = pingEndPoint;
+		return this;
+	}
+
+	public WebAppTest pingStatusCode(int pingStatusCode) {
+		this.pingStatusCode = pingStatusCode;
 		return this;
 	}
 
@@ -277,7 +283,8 @@ public class WebAppTest {
 					    if (connection instanceof HttpURLConnection) {
 						    HttpURLConnection httpConnection =
 						            (HttpURLConnection) connection;
-						    return httpConnection.getResponseCode() == 200;
+						    return httpConnection
+						        .getResponseCode() == pingStatusCode;
 					    }
 					    return false;
 				    }
