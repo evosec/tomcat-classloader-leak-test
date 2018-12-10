@@ -254,7 +254,8 @@ public class WebAppTest {
 			if (tomcat != null && !contextIsDestroyed.call()) {
 				tomcat.stop();
 				tomcat.destroy();
-				Awaitility.await().atMost(stopTimeoutInSeconds, SECONDS)
+				Awaitility.await()
+				    .atMost(stopTimeoutInSeconds, SECONDS)
 				    .until(contextIsDestroyed);
 			}
 		} catch (Exception e) {
@@ -274,7 +275,8 @@ public class WebAppTest {
 
 	private void ping(final URL url) throws WebAppTestException {
 		try {
-			Awaitility.await().atMost(deployTimeoutInSeconds, SECONDS)
+			Awaitility.await()
+			    .atMost(deployTimeoutInSeconds, SECONDS)
 			    .until(new Callable<Boolean>() {
 
 				    @Override
@@ -312,7 +314,8 @@ public class WebAppTest {
 		System.gc();
 
 		try {
-			Awaitility.await().atMost(leakTestFirstTimeoutInSeconds, SECONDS)
+			Awaitility.await()
+			    .atMost(leakTestFirstTimeoutInSeconds, SECONDS)
 			    .until(classLoaderReferenceIsNull);
 		} catch (ConditionTimeoutException e) {
 			// ignore
@@ -323,7 +326,8 @@ public class WebAppTest {
 		createClassesUntil(classLoaderReferenceIsNull);
 
 		try {
-			Awaitility.await().atMost(leakTestSecondTimeoutInSeconds, SECONDS)
+			Awaitility.await()
+			    .atMost(leakTestSecondTimeoutInSeconds, SECONDS)
 			    .until(classLoaderReferenceIsNull);
 		} catch (ConditionTimeoutException e) {
 			throw new WebAppTestException("ClassLoader not GC'ed", e);
