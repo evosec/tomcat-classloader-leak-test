@@ -363,8 +363,8 @@ public class WebAppTest {
 						makeClass.toClass(classLoader,
 						    this.getClass().getProtectionDomain());
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
+				} catch (Throwable t) {
+					t.printStackTrace();
 				}
 			}
 
