@@ -311,7 +311,7 @@ public class WebAppTest {
 
 		};
 
-		System.gc();
+		forceGc(3);
 
 		try {
 			Awaitility.await()
@@ -321,7 +321,7 @@ public class WebAppTest {
 			// ignore
 		}
 
-		System.gc();
+		forceGc(3);
 
 		createClassesUntil(classLoaderReferenceIsNull);
 
@@ -331,6 +331,20 @@ public class WebAppTest {
 			    .until(classLoaderReferenceIsNull);
 		} catch (ConditionTimeoutException e) {
 			throw new WebAppTestException("ClassLoader not GC'ed", e);
+		}
+	}
+
+	private void forceGc(int n) {
+		for (int i = 0; i < n; i++) {
+			forceGc();
+		}
+	}
+
+	private void forceGc() {
+		WeakReference<Object> ref = new WeakReference<>(new Object());
+		// Until garbage collection has actually been run
+		while (ref.get() != null) {
+			System.gc();
 		}
 	}
 
