@@ -245,15 +245,9 @@ public class WebAppTest {
 
 	private void shutdownTomcat() throws WebAppTestException {
 		try {
-			Callable<Boolean> contextIsDestroyed = new Callable<Boolean>() {
-
-				@Override
-				public Boolean call() throws Exception {
-					return destroyListener.isDestroyed()
-					        && destroyListener.isStopped();
-				}
-
-			};
+			Callable<Boolean> contextIsDestroyed =
+			        () -> destroyListener.isDestroyed()
+			                && destroyListener.isStopped();
 			if (tomcat != null && !contextIsDestroyed.call()) {
 				tomcat.stop();
 				tomcat.destroy();
@@ -280,19 +274,15 @@ public class WebAppTest {
 		try {
 			Awaitility.await()
 			    .atMost(deployTimeoutInSeconds, SECONDS)
-			    .until(new Callable<Boolean>() {
-
-				    @Override
-				    public Boolean call() throws Exception {
-					    URLConnection connection = url.openConnection();
-					    if (connection instanceof HttpURLConnection) {
-						    HttpURLConnection httpConnection =
-						            (HttpURLConnection) connection;
-						    return httpConnection
-						        .getResponseCode() == pingStatusCode;
-					    }
-					    return false;
+			    .until((Callable<Boolean>) () -> {
+				    URLConnection connection = url.openConnection();
+				    if (connection instanceof HttpURLConnection) {
+					    HttpURLConnection httpConnection =
+					            (HttpURLConnection) connection;
+					    return httpConnection
+					        .getResponseCode() == pingStatusCode;
 				    }
+				    return false;
 			    });
 		} catch (ConditionTimeoutException e) {
 			throw new WebAppTestException(
@@ -305,14 +295,8 @@ public class WebAppTest {
 			return;
 		}
 
-		Callable<Boolean> classLoaderReferenceIsNull = new Callable<Boolean>() {
-
-			@Override
-			public Boolean call() throws Exception {
-				return classLoaderReference.get() == null;
-			}
-
-		};
+		Callable<Boolean> classLoaderReferenceIsNull =
+		        () -> classLoaderReference.get() == null;
 
 		forceGc(3);
 
