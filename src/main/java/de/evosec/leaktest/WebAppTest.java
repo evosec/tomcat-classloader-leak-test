@@ -182,7 +182,10 @@ public class WebAppTest {
 			ping(new URL("http", "localhost", port,
 			    contextPath + "/" + pingEndPoint));
 
-		} catch (IOException | IllegalStateException | LifecycleException e) {
+			Thread.sleep(2_500);
+
+		} catch (IOException | IllegalStateException | LifecycleException
+		        | InterruptedException e) {
 			shutdownTomcat();
 			throw new WebAppTestException(e);
 		}
