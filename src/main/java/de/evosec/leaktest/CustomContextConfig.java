@@ -23,7 +23,7 @@ public class CustomContextConfig extends ContextConfig {
 	}
 
 	@Override
-	protected void init() {
+	protected synchronized void init() {
 		context.addParameter("server.port", "" + port);
 		context.addParameter("server.context-path", contextPath);
 		context.addParameter("server.servlet.context-path", contextPath);
